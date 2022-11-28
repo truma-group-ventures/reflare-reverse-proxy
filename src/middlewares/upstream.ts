@@ -72,6 +72,8 @@ export const useUpstream: Middleware = async (
 
   let upstreamRequest = cloneRequest(url, request);
 
+  const fetchOptions: any = {};
+
   if (onRequest) {
     upstreamRequest = onRequest.reduce(
       (prevRequest: Request, fn: onRequestCallback) => fn(cloneRequest(url, prevRequest), url),
@@ -79,7 +81,11 @@ export const useUpstream: Middleware = async (
     );
   }
 
-  context.response = await fetch(upstreamRequest);
+  if (upstreamRequest.method == 'POST') {
+    fetchOptions.redirect = 'manual';
+  }
+
+  context.response = await fetch(upstreamRequest, fetchOptions);
 
   if (onResponse) {
     context.response = onResponse.reduce(
